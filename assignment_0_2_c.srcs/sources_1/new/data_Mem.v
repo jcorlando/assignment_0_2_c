@@ -1,20 +1,20 @@
 `timescale 1ns / 1ps
 
-module data_Mem
+module data_Mem # ( parameter WL = 32, WL_addr = 32, MEM_Depth = 64 )
 (
     input CLK, DMWE,
-    input [31:0] DMA, DMWD,
-    output [31:0] DMRD
+    input [WL_addr - 1 : 0] DMA,
+    input [WL - 1 : 0] DMWD,
+    output [WL - 1 : 0] DMRD
 );
-
     
-    reg [31 : 0] ram[63 : 0];
+    reg [WL - 1 : 0] ram[MEM_Depth - 1 : 0];
     initial $readmemh("my_Memory.mem", ram);
     
-    assign DMRD = ram[DMA[31 : 2]];
+    assign DMRD = ram[DMA[WL_addr - 1 : 2]];    // Word Aligned
     
     always @ (posedge CLK)
-    if (DMWE) ram[DMA[31 : 2]] <= DMWD;
+    if (DMWE) ram[DMA[WL_addr - 1 : 2]] <= DMWD;    // Word Aligned
     
     
 endmodule

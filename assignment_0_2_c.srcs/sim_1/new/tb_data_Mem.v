@@ -2,33 +2,38 @@
 
 module tb_data_Mem;
 
+// Parameters
+parameter WL = 32, WL_addr = 32, MEM_Depth = 64;
 //Inputs
 reg CLK;
 reg DMWE;
-reg [31:0] DMA;
-reg [31:0] DMWD;
+reg [WL_addr - 1 : 0] DMA;
+reg [WL - 1 : 0] DMWD;
 //Outputs
-wire [31:0] DMRD;
+wire [WL - 1 : 0] DMRD;
 // Clock generation
 initial
 begin
     CLK <= 0;
     DMWE <= 0;
-    DMA  <= 32'h000000d8;
+    DMA  <= 32'h000000dc;
     DMWD <= 32'h11111111;
 end
 always #50 CLK <= ~CLK;
 //Instantiate DUT
-data_Mem DUT( .CLK(CLK), .DMWE(DMWE), .DMA(DMA), .DMWD(DMWD), .DMRD(DMRD) );
+data_Mem # ( .WL(WL), .WL_addr(WL_addr), .MEM_Depth(MEM_Depth) )
+            DUT( .CLK(CLK), .DMWE(DMWE), .DMA(DMA), .DMWD(DMWD), .DMRD(DMRD) );
 
 initial
 begin
     @(posedge CLK);
+    DMWE <= 1;
     DMA  <= 32'h000000dc;
     @(posedge CLK);
-    DMA  <= 32'h000000e0;
+    DMWE <= 0;
+    DMA  <= 32'h000000dc;
     @(posedge CLK);
-    DMA  <= 32'h000000e4;
+    DMA  <= 32'h000000dc;
     @(posedge CLK);
     DMA  <= 32'h000000e8;
     @(posedge CLK);
